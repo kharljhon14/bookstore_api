@@ -3,9 +3,13 @@ extern crate rocket;
 
 use migrator::{Migrator, MigratorTrait};
 
+mod controllers;
 mod db;
 mod entities;
 mod migrator;
+
+use controllers::{Response, SuccessResponse};
+use rocket::http::Status;
 
 pub struct AppConfig {
     db_host: String,
@@ -29,8 +33,8 @@ impl Default for AppConfig {
 }
 
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+fn index() -> Response<String> {
+    Ok(SuccessResponse((Status::Ok, "Hello, World".to_string())))
 }
 
 #[launch]
@@ -40,5 +44,30 @@ async fn rocket() -> _ {
     let db = db::connect(&config).await.unwrap();
     Migrator::up(&db, None).await.unwrap();
 
-    rocket::build().mount("/", routes![index])
+    rocket::build()
+        .mount("/", routes![index])
+        .mount(
+            "/auth",
+            routes![controllers::auth::sign_in, controllers::auth::sign_up],
+        )
+        .mount(
+            "/authors",
+            routes![
+                controllers::author::index,
+                controllers::author::create,
+                controllers::author::show,
+                controllers::author::update,
+                controllers::author::delete
+            ],
+        )
+        .mount(
+            "/books",
+            routes![
+                controllers::book::index,
+                controllers::book::create,
+                controllers::book::show,
+                controllers::book::update,
+                controllers::book::delete
+            ],
+        )
 }
