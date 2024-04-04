@@ -33,12 +33,12 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(Author::CreatedAt)
                             .timestamp()
-                            .extra("DEFAULT CURRENT_TIMESTAMPS".to_owned()),
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
                     )
                     .col(
                         ColumnDef::new(Author::UpdatedAt)
                             .timestamp()
-                            .extra("DEFAULT CURRENT_TIMESTAMPS".to_owned()),
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
                     )
                     .to_owned(),
             )

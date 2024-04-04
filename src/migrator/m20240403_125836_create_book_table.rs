@@ -41,12 +41,12 @@ impl MigrationTrait for Migration {
                     .col(
                         ColumnDef::new(Book::CreatedAt)
                             .timestamp()
-                            .extra("DEFAULT CURRENT_TIMESTAMPS".to_owned()),
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
                     )
                     .col(
                         ColumnDef::new(Book::UpdatedAt)
                             .timestamp()
-                            .extra("DEFAULT CURRENT_TIMESTAMPS".to_owned()),
+                            .extra("DEFAULT CURRENT_TIMESTAMP".to_owned()),
                     )
                     .to_owned(),
             )
