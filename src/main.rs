@@ -4,6 +4,7 @@ extern crate rocket;
 use migrator::{Migrator, MigratorTrait};
 
 mod db;
+mod entities;
 mod migrator;
 
 pub struct AppConfig {
