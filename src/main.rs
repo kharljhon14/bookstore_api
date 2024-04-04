@@ -36,7 +36,7 @@ fn index() -> &'static str {
 async fn rocket() -> _ {
     let config = AppConfig::default();
 
-    let db = db::connect(&config).unwrap();
+    let db = db::connect(&config).await.unwrap();
     Migrator::up(&db, None).await.unwrap();
 
     rocket::build().mount("/", routes![index])
