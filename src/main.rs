@@ -1,11 +1,13 @@
 #[macro_use]
 extern crate rocket;
 
+use fairings::{options, CORS};
 use migrator::{Migrator, MigratorTrait};
 
 mod controllers;
 mod db;
 mod entities;
+mod fairings;
 mod migrator;
 
 use controllers::{Response, SuccessResponse};
@@ -45,6 +47,8 @@ async fn rocket() -> _ {
     Migrator::up(&db, None).await.unwrap();
 
     rocket::build()
+        .attach(CORS)
+        .mount("/", routes![options])
         .mount("/", routes![index])
         .mount(
             "/auth",
