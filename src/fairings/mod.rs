@@ -1,3 +1,5 @@
+// *Fairings are middlewares
+
 use rocket::{
     fairing::{Fairing, Info, Kind},
     http::Header,
