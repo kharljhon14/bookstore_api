@@ -14,6 +14,7 @@ sea-orm = { version = "0.12", features = [
 rocket = { version = "^0.5.0-rc.2", features = ["json"] }
 jsonwebtoken = "9.3.0"
 bcrypt = "0.15.1"
+dotenvy = "0.15.7"
 
 [dependencies.sea-orm-migration]
 version = "0.12"
