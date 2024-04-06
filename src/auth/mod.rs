@@ -15,7 +15,7 @@ pub struct Claims {
 }
 
 pub struct AuthenticatedUser {
-    id: u32,
+    pub id: u32,
 }
 
 #[rocket::async_trait]

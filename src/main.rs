@@ -60,7 +60,11 @@ async fn rocket() -> _ {
         .mount("/", routes![index])
         .mount(
             "/auth",
-            routes![controllers::auth::sign_in, controllers::auth::sign_up],
+            routes![
+                controllers::auth::sign_in,
+                controllers::auth::sign_up,
+                controllers::auth::me
+            ],
         )
         .mount(
             "/authors",

@@ -12,7 +12,7 @@ use sea_orm::DatabaseConnection;
 
 use super::{ErrorResponse, Response, SuccessResponse};
 use crate::{
-    auth::Claims,
+    auth::{AuthenticatedUser, Claims},
     entities::{prelude::*, user},
     AppConfig,
 };
@@ -124,5 +124,13 @@ pub async fn sign_up(
     Ok(SuccessResponse((
         Status::Created,
         "Account created".to_string(),
+    )))
+}
+
+#[get("/me")]
+pub async fn me(_db: &State<DatabaseConnection>, user: AuthenticatedUser) -> Response<String> {
+    Ok(SuccessResponse((
+        Status::Ok,
+        "My user ID is: ".to_string() + user.id.to_string().as_str(),
     )))
 }
