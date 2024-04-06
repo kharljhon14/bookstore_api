@@ -4,7 +4,6 @@ use bcrypt::{hash, verify, DEFAULT_COST};
 
 use jsonwebtoken::{encode, EncodingKey, Header};
 use rocket::{
-    futures::future::ok,
     http::Status,
     serde::{json::Json, Deserialize, Serialize},
     State,
@@ -13,6 +12,7 @@ use sea_orm::DatabaseConnection;
 
 use super::{ErrorResponse, Response, SuccessResponse};
 use crate::{
+    auth::Claims,
     entities::{prelude::*, user},
     AppConfig,
 };
@@ -29,14 +29,6 @@ pub struct ReqSignIn {
 #[serde(crate = "rocket::serde")]
 pub struct ResSignIn {
     token: String,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[serde(crate = "rocket::serde")]
-struct Claims {
-    sub: i32,
-    role: String,
-    exp: u64,
 }
 
 #[post("/sign-in", data = "<req_sign_in>")]
@@ -72,7 +64,7 @@ pub async fn sign_in(
     let exp_time = 4 * 60 * 60;
 
     let claims = Claims {
-        sub: user.id,
+        sub: user.id as u32,
         role: "user".to_string(),
         exp: SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)

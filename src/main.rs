@@ -4,6 +4,7 @@ extern crate rocket;
 use fairings::{options, CORS};
 use migrator::{Migrator, MigratorTrait};
 
+mod auth;
 mod controllers;
 mod db;
 mod entities;
