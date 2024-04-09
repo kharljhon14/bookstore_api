@@ -7,7 +7,7 @@ use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, QueryOrder, Set
 
 use crate::{
     auth::AuthenticatedUser,
-    entities::{author, prelude::*, user},
+    entities::{author, prelude::*},
 };
 
 use super::{Response, SuccessResponse};

@@ -10,7 +10,7 @@ use rocket::{
 };
 use sea_orm::DatabaseConnection;
 
-use super::{ErrorResponse, Response, SuccessResponse};
+use super::{ErrorResponse, ResError, Response, SuccessResponse};
 use crate::{
     auth::{AuthenticatedUser, Claims},
     entities::{prelude::*, user},
@@ -49,7 +49,9 @@ pub async fn sign_in(
         None => {
             return Err(ErrorResponse((
                 Status::Unauthorized,
-                "Invalid credentials".to_string(),
+                Json(ResError {
+                    message: "Invalid credentials".to_string(),
+                }),
             )))
         }
     };
@@ -57,7 +59,9 @@ pub async fn sign_in(
     if !verify(&req_sign_in.password, &user.password).unwrap() {
         return Err(ErrorResponse((
             Status::Unauthorized,
-            "Invalid credentials".to_string(),
+            Json(ResError {
+                message: "Invalid credentials".to_string(),
+            }),
         )));
     }
 
@@ -107,7 +111,11 @@ pub async fn sign_up(
     {
         return Err(ErrorResponse((
             Status::UnprocessableEntity,
-            "An account exists with that email".to_string(),
+            Json({
+                ResError {
+                    message: "An account exists with that email".to_string(),
+                }
+            }),
         )));
     }
 
