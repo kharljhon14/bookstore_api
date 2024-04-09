@@ -1,13 +1,13 @@
 use rocket::{
     http::Status,
-    serde::{json::Json, Serialize},
+    serde::{json::Json, Deserialize, Serialize},
     State,
 };
-use sea_orm::{DatabaseConnection, EntityTrait, QueryOrder};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, QueryOrder, Set};
 
 use crate::{
     auth::AuthenticatedUser,
-    entities::{author, prelude::*},
+    entities::{author, prelude::*, user},
 };
 
 use super::{Response, SuccessResponse};
@@ -26,6 +26,14 @@ pub struct ResAuthor {
 pub struct ResAuthorList {
     total: usize,
     authors: Vec<ResAuthor>,
+}
+
+#[derive(Deserialize)]
+#[serde(crate = "rocket::serde")]
+pub struct ReqAuthor {
+    firstname: String,
+    lastname: String,
+    bio: String,
 }
 
 #[get("/")]
@@ -57,9 +65,33 @@ pub async fn index(
     )))
 }
 
-#[post("/")]
-pub async fn create() -> Response<String> {
-    todo!()
+#[post("/", data = "<req_author>")]
+pub async fn create(
+    db: &State<DatabaseConnection>,
+    user: AuthenticatedUser,
+    req_author: Json<ReqAuthor>,
+) -> Response<Json<ResAuthor>> {
+    let db = db as &DatabaseConnection;
+
+    let author = author::ActiveModel {
+        user_id: Set(user.id as i32),
+        firstname: Set(req_author.firstname.to_owned()),
+        lastname: Set(req_author.lastname.to_owned()),
+        bio: Set(req_author.bio.to_owned()),
+        ..Default::default()
+    };
+
+    let author = author.insert(db).await?;
+
+    Ok(SuccessResponse((
+        Status::Created,
+        Json(ResAuthor {
+            id: author.id,
+            firstname: author.firstname,
+            lastname: author.lastname,
+            bio: author.bio,
+        }),
+    )))
 }
 
 #[get("/<id>")]
