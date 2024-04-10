@@ -1,6 +1,6 @@
 use rocket::{
     http::Status,
-    serde::{json::Json, Deserialize, Serialize},
+    serde::{json::Json, Serialize},
 };
 use sea_orm::DbErr;
 

@@ -16,7 +16,8 @@ use crate::{
     entities::{prelude::*, user},
     AppConfig,
 };
-use sea_orm::{prelude::DateTimeUtc, *};
+
+use sea_orm::*;
 
 #[derive(Deserialize)]
 #[serde(crate = "rocket::serde")]
