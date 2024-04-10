@@ -26,6 +26,17 @@ pub struct ResAuthor {
     bio: String,
 }
 
+impl From<&author::Model> for ResAuthor {
+    fn from(a: &author::Model) -> Self {
+        Self {
+            id: a.id,
+            firstname: a.firstname.to_owned(),
+            lastname: a.lastname.to_owned(),
+            bio: a.bio.to_owned(),
+        }
+    }
+}
+
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct ResAuthorList {
@@ -53,12 +64,7 @@ pub async fn index(
         .all(db)
         .await?
         .iter()
-        .map(|author| ResAuthor {
-            id: author.id,
-            firstname: author.firstname.to_owned(),
-            lastname: author.lastname.to_owned(),
-            bio: author.bio.to_owned(),
-        })
+        .map(ResAuthor::from)
         .collect::<Vec<_>>();
 
     Ok(SuccessResponse((
@@ -90,12 +96,7 @@ pub async fn create(
 
     Ok(SuccessResponse((
         Status::Created,
-        Json(ResAuthor {
-            id: author.id,
-            firstname: author.firstname,
-            lastname: author.lastname,
-            bio: author.bio,
-        }),
+        Json(ResAuthor::from(&author)),
     )))
 }
 
@@ -164,12 +165,7 @@ pub async fn update(
 
     Ok(SuccessResponse((
         Status::Ok,
-        Json(ResAuthor {
-            id: author.id,
-            firstname: author.firstname,
-            lastname: author.lastname,
-            bio: author.bio,
-        }),
+        Json(ResAuthor::from(&author)),
     )))
 }
 
