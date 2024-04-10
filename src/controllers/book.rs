@@ -27,6 +27,18 @@ pub struct ResBook {
     author_id: i32,
 }
 
+impl From<&book::Model> for ResBook {
+    fn from(b: &book::Model) -> Self {
+        Self {
+            id: b.id,
+            title: b.title.to_owned(),
+            year: b.year.to_owned(),
+            cover: b.cover.to_owned(),
+            author_id: b.author_id,
+        }
+    }
+}
+
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
 pub struct ResBookList {
@@ -55,13 +67,7 @@ pub async fn index(
         .all(db)
         .await?
         .iter()
-        .map(|book| ResBook {
-            id: book.id,
-            author_id: book.author_id,
-            title: book.title.to_owned(),
-            year: book.year.to_owned(),
-            cover: book.cover.to_owned(),
-        })
+        .map(ResBook::from)
         .collect::<Vec<_>>();
 
     Ok(SuccessResponse((
@@ -94,13 +100,7 @@ pub async fn create(
 
     Ok(SuccessResponse((
         Status::Created,
-        Json(ResBook {
-            id: book.id,
-            title: book.title,
-            year: book.year,
-            cover: book.cover,
-            author_id: book.author_id,
-        }),
+        Json(ResBook::from(&book)),
     )))
 }
 
@@ -126,16 +126,7 @@ pub async fn show(
         }
     };
 
-    Ok(SuccessResponse((
-        Status::Ok,
-        Json(ResBook {
-            id: book.id,
-            author_id: book.author_id,
-            title: book.title,
-            year: book.year,
-            cover: book.cover,
-        }),
-    )))
+    Ok(SuccessResponse((Status::Ok, Json(ResBook::from(&book)))))
 }
 
 #[put("/<id>", data = "<req_book>")]
@@ -170,16 +161,7 @@ pub async fn update(
 
     let book = book.update(db).await?;
 
-    Ok(SuccessResponse((
-        Status::Ok,
-        Json(ResBook {
-            id: book.id,
-            author_id: book.author_id,
-            title: book.title,
-            year: book.year,
-            cover: book.cover,
-        }),
-    )))
+    Ok(SuccessResponse((Status::Ok, Json(ResBook::from(&book)))))
 }
 
 #[delete("/<id>")]
