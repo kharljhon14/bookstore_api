@@ -10,7 +10,7 @@ use crate::{
     entities::{book, prelude::*},
 };
 
-use super::{ErrorResponse, ResError, Response, SuccessResponse};
+use super::{ErrorResponse, GenericResponse, Response, SuccessResponse};
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
@@ -114,7 +114,7 @@ pub async fn show(
         None => {
             return Err(ErrorResponse((
                 Status::NotFound,
-                Json(ResError {
+                Json(GenericResponse {
                     message: "Cannot find a book with specified ID".to_string(),
                 }),
             )))

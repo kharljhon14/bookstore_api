@@ -3,14 +3,14 @@ use rocket::{
     serde::{json::Json, Deserialize, Serialize},
     State,
 };
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, QueryOrder, Set};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, ModelTrait, QueryOrder, Set};
 
 use crate::{
     auth::AuthenticatedUser,
     entities::{author, prelude::*},
 };
 
-use super::{ErrorResponse, ResError, Response, SuccessResponse};
+use super::{ErrorResponse, GenericResponse, Response, SuccessResponse};
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
@@ -109,7 +109,7 @@ pub async fn show(
         None => {
             return Err(ErrorResponse((
                 Status::NotFound,
-                Json(ResError {
+                Json(GenericResponse {
                     message: "Cannot find author with specified ID.".to_string(),
                 }),
             )));
@@ -133,6 +133,33 @@ pub async fn update(id: u32) -> Response<String> {
 }
 
 #[delete("/<id>")]
-pub async fn delete(id: u32) -> Response<String> {
-    todo!()
+pub async fn delete(
+    db: &State<DatabaseConnection>,
+    _user: AuthenticatedUser,
+    id: i32,
+) -> Response<Json<GenericResponse>> {
+    let db = db as &DatabaseConnection;
+
+    let author = Author::find_by_id(id).one(db).await?;
+
+    let author = match author {
+        Some(a) => a,
+        None => {
+            return Err(ErrorResponse((
+                Status::NotFound,
+                Json(GenericResponse {
+                    message: "Cannot find author with specified ID".to_string(),
+                }),
+            )))
+        }
+    };
+
+    author.delete(db).await?;
+
+    Ok(SuccessResponse((
+        Status::Ok,
+        Json(GenericResponse {
+            message: "Author deleted".to_string(),
+        }),
+    )))
 }

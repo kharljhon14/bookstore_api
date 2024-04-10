@@ -10,7 +10,7 @@ pub mod book;
 
 #[derive(Serialize)]
 #[serde(crate = "rocket::serde")]
-pub struct ResError {
+pub struct GenericResponse {
     message: String,
 }
 
@@ -18,7 +18,7 @@ pub struct ResError {
 pub struct SuccessResponse<T>(pub (Status, T));
 
 #[derive(Responder)]
-pub struct ErrorResponse(pub (Status, Json<ResError>));
+pub struct ErrorResponse(pub (Status, Json<GenericResponse>));
 
 pub type Response<T> = Result<SuccessResponse<T>, ErrorResponse>;
 
@@ -26,7 +26,7 @@ impl From<DbErr> for ErrorResponse {
     fn from(err: DbErr) -> Self {
         ErrorResponse((
             Status::InternalServerError,
-            Json(ResError {
+            Json(GenericResponse {
                 message: err.to_string(),
             }),
         ))
