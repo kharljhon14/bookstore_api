@@ -3,7 +3,7 @@ use rocket::{
     serde::{json::Json, Deserialize, Serialize},
     State,
 };
-use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, QueryOrder, Set};
+use sea_orm::{ActiveModelTrait, DatabaseConnection, EntityTrait, ModelTrait, QueryOrder, Set};
 
 use crate::{
     auth::AuthenticatedUser,
@@ -139,6 +139,33 @@ pub async fn update(id: u32) -> Response<String> {
 }
 
 #[delete("/<id>")]
-pub async fn delete(id: u32) -> Response<String> {
-    todo!()
+pub async fn delete(
+    db: &State<DatabaseConnection>,
+    _user: AuthenticatedUser,
+    id: i32,
+) -> Response<Json<GenericResponse>> {
+    let db = db as &DatabaseConnection;
+
+    let book = Book::find_by_id(id).one(db).await?;
+
+    let book = match book {
+        Some(b) => b,
+        None => {
+            return Err(ErrorResponse((
+                Status::NotFound,
+                Json(GenericResponse {
+                    message: "Cannot find book with specified ID".to_string(),
+                }),
+            )))
+        }
+    };
+
+    book.delete(db).await?;
+
+    Ok(SuccessResponse((
+        Status::Ok,
+        Json(GenericResponse {
+            message: "Book deleted".to_string(),
+        }),
+    )))
 }
